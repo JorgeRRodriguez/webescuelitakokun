@@ -1,0 +1,347 @@
+// Kokun · Plataforma escolar — modelo de datos
+// SQLite no soporta enums nativos ni listas escalares: los "enums" se
+// modelan como String (ver src/lib/enums.ts para los valores válidos) y
+// las listas como modelos relacionados.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Escuela / estructura académica
+// ---------------------------------------------------------------------------
+
+model School {
+  id     String  @id @default(cuid())
+  name   String
+  cycle  String // "2026-2027"
+  levels Level[]
+}
+
+model Level {
+  id       String  @id @default(cuid())
+  school   School  @relation(fields: [schoolId], references: [id])
+  schoolId String
+  name     String // "Maternal" | "Kinder"
+  groups   Group[]
+}
+
+model Group {
+  id        String             @id @default(cuid())
+  level     Level              @relation(fields: [levelId], references: [id])
+  levelId   String
+  name      String // "Colibríes"
+  room      String // "Salón 2"
+  schedule  String // "8:00 a 14:00"
+  project   String // proyecto del periodo
+  routine   GroupRoutineItem[]
+  children  Child[]
+  staff     StaffAssignment[]
+  notices   Notice[]
+  events    Event[]
+}
+
+model GroupRoutineItem {
+  id       String @id @default(cuid())
+  group    Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId  String
+  time     String // "9:00"
+  activity String
+  order    Int
+}
+
+// ---------------------------------------------------------------------------
+// Personal
+// ---------------------------------------------------------------------------
+
+model Staff {
+  id             String            @id @default(cuid())
+  name           String
+  email          String            @unique
+  passwordHash   String
+  role           String // ver Role en src/lib/enums.ts
+  bio            String?
+  attentionHours String?
+  avatarInitials String
+  avatarColor    String
+  assignments    StaffAssignment[]
+  dailyEntries   DailyEntry[]
+  dailySummaries DailySummary[]
+  notices        Notice[]
+  payments       Payment[]
+  auditLogs      AuditLog[]
+  attendancesRegistered Attendance[]
+}
+
+model StaffAssignment {
+  id        String  @id @default(cuid())
+  staff     Staff   @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  staffId   String
+  group     Group?  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId   String?
+  roleLabel String // "Titular" | "Auxiliar" | "Música" | "Psicomotricidad"
+}
+
+// ---------------------------------------------------------------------------
+// Niños y familias
+// ---------------------------------------------------------------------------
+
+model Child {
+  id               String             @id @default(cuid())
+  firstName        String
+  lastName         String
+  group            Group              @relation(fields: [groupId], references: [id])
+  groupId          String
+  birthDate        DateTime
+  allergySevere    Boolean            @default(false)
+  allergyDetail    String?
+  feedingNotes     String?
+  sleepNotes       String?
+  likes            String?
+  adaptationNotes  String?
+  photoVisibility  Boolean            @default(true)
+  avatarColor      String
+  emergencyContacts EmergencyContact[]
+  guardians        ChildGuardian[]
+  attendances      Attendance[]
+  dailyEntries     DailyEntry[]
+  dailySummaries   DailySummary[]
+  noticeRecipients NoticeRecipient[]
+  eventGuardians   EventGuardian[]
+  charges          Charge[]
+}
+
+model EmergencyContact {
+  id           String @id @default(cuid())
+  child        Child  @relation(fields: [childId], references: [id], onDelete: Cascade)
+  childId      String
+  name         String
+  relationship String
+  phone        String
+}
+
+model Guardian {
+  id                String            @id @default(cuid())
+  name              String
+  email             String            @unique
+  phone             String?
+  passwordHash      String
+  relationshipLabel String // "Mamá" | "Papá" | "Abuela" | "Niñera" ...
+  children          ChildGuardian[]
+  noticeRecipients  NoticeRecipient[]
+  eventGuardians    EventGuardian[]
+  payments          Payment[]
+}
+
+model ChildGuardian {
+  id          String   @id @default(cuid())
+  child       Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+  childId     String
+  guardian    Guardian @relation(fields: [guardianId], references: [id], onDelete: Cascade)
+  guardianId  String
+  receivesComms Boolean @default(true)
+  canPickUp   Boolean  @default(false)
+  canPay      Boolean  @default(false)
+  isPrimary   Boolean  @default(false)
+
+  @@unique([childId, guardianId])
+}
+
+// ---------------------------------------------------------------------------
+// Día a día
+// ---------------------------------------------------------------------------
+
+model Attendance {
+  id               String    @id @default(cuid())
+  child            Child     @relation(fields: [childId], references: [id], onDelete: Cascade)
+  childId          String
+  date             DateTime
+  status           String // "PRESENTE" | "AUSENTE"
+  checkInTime      DateTime?
+  checkInBy        String? // "Mariana (mamá)"
+  checkOutTime     DateTime?
+  checkOutBy       String?
+  registeredById   String?
+  registeredByStaff Staff?   @relation(fields: [registeredById], references: [id])
+
+  @@unique([childId, date])
+}
+
+model DailyEntry {
+  id             String   @id @default(cuid())
+  child          Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+  childId        String
+  date           DateTime
+  type           String // "COMIDA" | "SIESTA" | "PANIAL" | "ACTIVIDAD" | "OBSERVACION"
+  time           DateTime
+  title          String
+  detail         String?
+  exceptionValue String? // "Mitad" | "Poco" | "Nada" | "Mojado" | "Sucio" | "Usó baño" ...
+  startTime      DateTime?
+  endTime        DateTime?
+  photoUrl       String?
+  authorId       String
+  author         Staff    @relation(fields: [authorId], references: [id])
+  batchId        String // agrupa una captura para todo el grupo
+  createdAt      DateTime @default(now())
+}
+
+model DailySummary {
+  id                   String    @id @default(cuid())
+  child                Child     @relation(fields: [childId], references: [id], onDelete: Cascade)
+  childId              String
+  date                 DateTime
+  mood                 String? // "Feliz" | "Tranquila" | "Inquieta" | "Cansada" | "Sensible"
+  note                 String?
+  materialsForTomorrow String?
+  status               String    @default("SIN_REGISTROS") // SIN_REGISTROS|POR_REVISAR|ENVIADO|VISTO
+  authorId             String?
+  author               Staff?    @relation(fields: [authorId], references: [id])
+  sentAt               DateTime?
+  readAt               DateTime?
+
+  @@unique([childId, date])
+}
+
+// ---------------------------------------------------------------------------
+// Avisos y eventos
+// ---------------------------------------------------------------------------
+
+model Notice {
+  id             String            @id @default(cuid())
+  title          String
+  body           String
+  audienceScope  String // "PLANTEL" | "NIVEL" | "GRUPO" | "ALUMNO"
+  group          Group?            @relation(fields: [groupId], references: [id])
+  groupId        String?
+  responseType   String // "LECTURA" | "ENTERADO" | "AUTORIZACION"
+  dueAt          DateTime?
+  createdAt      DateTime          @default(now())
+  authorId       String
+  author         Staff             @relation(fields: [authorId], references: [id])
+  addToCalendar  Boolean           @default(false)
+  recipients     NoticeRecipient[]
+}
+
+model NoticeRecipient {
+  id          String    @id @default(cuid())
+  notice      Notice    @relation(fields: [noticeId], references: [id], onDelete: Cascade)
+  noticeId    String
+  guardian    Guardian  @relation(fields: [guardianId], references: [id], onDelete: Cascade)
+  guardianId  String
+  child       Child     @relation(fields: [childId], references: [id], onDelete: Cascade)
+  childId     String
+  readAt      DateTime?
+  response    String    @default("PENDIENTE") // PENDIENTE|ENTERADO|AUTORIZO|NO_AUTORIZO
+  respondedAt DateTime?
+
+  @@unique([noticeId, guardianId, childId])
+}
+
+model Event {
+  id            String          @id @default(cuid())
+  title         String
+  description   String?
+  type          String // "ESCUELA" | "GRUPO" | "MATERIAL"
+  date          DateTime
+  audienceScope String // "PLANTEL" | "NIVEL" | "GRUPO"
+  group         Group?          @relation(fields: [groupId], references: [id])
+  groupId       String?
+  rsvpRequired  Boolean         @default(false)
+  guardians     EventGuardian[]
+}
+
+model EventGuardian {
+  id         String   @id @default(cuid())
+  event      Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId    String
+  guardian   Guardian @relation(fields: [guardianId], references: [id], onDelete: Cascade)
+  guardianId String
+  child      Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+  childId    String
+  reminder   Boolean  @default(false)
+  rsvp       String? // "ASISTIRE" | "NO_PODRE"
+
+  @@unique([eventId, guardianId, childId])
+}
+
+// ---------------------------------------------------------------------------
+// Cobranza
+// ---------------------------------------------------------------------------
+
+model Concept {
+  id                String   @id @default(cuid())
+  key               String   @unique // "COL", "INS", ...
+  name              String
+  amount            Float
+  unit              String // "mensual", "por alumno", ...
+  periodicity       String // "Una vez" | "Mensual" | "Por periodo" ...
+  validFrom         DateTime?
+  validTo           DateTime?
+  applicableMonths  String? // JSON string, ej. "[10,11,12]"
+  dueRule           String? // "día 10 del mes"
+  calculation       String?
+  charges           Charge[]
+}
+
+model Charge {
+  id          String    @id @default(cuid())
+  child       Child     @relation(fields: [childId], references: [id])
+  childId     String
+  concept     Concept   @relation(fields: [conceptId], references: [id])
+  conceptId   String
+  period      String // "Octubre 2026"
+  generatedAt DateTime  @default(now())
+  dueAt       DateTime
+  amount      Float // importe congelado al generar
+  status      String    @default("PENDIENTE") // PENDIENTE|VALIDACION|PAGADO|CANCELADO
+  allocations PaymentAllocation[]
+}
+
+model Payment {
+  id              String              @id @default(cuid())
+  guardian        Guardian            @relation(fields: [guardianId], references: [id])
+  guardianId      String
+  method          String // "TARJETA" | "SPEI" | "CAJA"
+  reference       String?
+  proofUrl        String?
+  amount          Float
+  status          String              @default("VALIDACION") // VALIDACION|CONFIRMADO|RECHAZADO
+  folio           String?
+  validatedById   String?
+  validatedByStaff Staff?             @relation(fields: [validatedById], references: [id])
+  validatedAt     DateTime?
+  createdAt       DateTime            @default(now())
+  allocations     PaymentAllocation[]
+}
+
+model PaymentAllocation {
+  id        String  @id @default(cuid())
+  payment   Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  paymentId String
+  charge    Charge  @relation(fields: [chargeId], references: [id])
+  chargeId  String
+  amount    Float
+}
+
+// ---------------------------------------------------------------------------
+// Auditoría
+// ---------------------------------------------------------------------------
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String
+  actor     Staff    @relation(fields: [actorId], references: [id])
+  action    String
+  entity    String
+  entityId  String
+  reason    String?
+  metadata  String? // JSON string
+  createdAt DateTime @default(now())
+}

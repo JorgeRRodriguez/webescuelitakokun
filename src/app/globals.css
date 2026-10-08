@@ -1,26 +1,132 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Marca */
+  --color-magenta: #B3166F;
+  --color-magenta-hover: #8E0F57;
+  --color-magenta-50: #F8E1EE;
+  --color-magenta-25: #FBF3F7;
+
+  --color-teal: #1E92B5;
+  --color-teal-50: #DDF0F6;
+  --color-teal-text: #156E8A;
+
+  --color-naranja: #F28C28;
+  --color-naranja-50: #FDEBD9;
+  --color-naranja-text: #B35F12;
+
+  --color-morado: #7B4BA8;
+  --color-morado-50: #EEE5F6;
+  --color-morado-text: #5D3585;
+
+  --color-verde: #5E9E1F;
+  --color-verde-50: #E7F3D9;
+  --color-verde-text: #3F7413;
+
+  --color-amarillo: #F6C423;
+  --color-amarillo-50: #FEF6DC;
+  --color-amarillo-text: #8A6400;
+
+  --color-rojo: #E5332A;
+  --color-rojo-50: #FDE7E5;
+  --color-rojo-text: #B42318;
+
+  --color-validacion-text: #A07800;
+
+  /* Texto */
+  --color-ink: #3A2440;
+  --color-texto-2: #5A4660;
+  --color-texto-3: #8A7586;
+  --color-texto-4: #A894A3;
+
+  /* Fondos / bordes */
+  --color-fondo-app: #FBF7F4;
+  --color-fondo-pagina: #F6F0EC;
+  --color-borde-card: #F0E4EA;
+  --color-borde-input: #E7D8E0;
+  --color-divisor: #F5ECF1;
+  --color-track: #F1E6EC;
+  --color-fila-destacada: #FFFBF0;
+
+  /* Avatares de alumnos */
+  --avatar-sofia: #B3166F;
+  --avatar-mateo: #1E92B5;
+  --avatar-valentina: #F28C28;
+  --avatar-emiliano: #5E9E1F;
+  --avatar-regina: #E5332A;
+  --avatar-santiago: #7B4BA8;
+  --avatar-camila: #C99700;
+  --avatar-leo: #14806F;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-heading: var(--font-baloo), sans-serif;
+  --font-sans: var(--font-nunito), sans-serif;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-magenta: var(--color-magenta);
+  --color-magenta-hover: var(--color-magenta-hover);
+  --color-magenta-50: var(--color-magenta-50);
+  --color-magenta-25: var(--color-magenta-25);
+
+  --color-teal: var(--color-teal);
+  --color-teal-50: var(--color-teal-50);
+  --color-teal-text: var(--color-teal-text);
+
+  --color-naranja: var(--color-naranja);
+  --color-naranja-50: var(--color-naranja-50);
+  --color-naranja-text: var(--color-naranja-text);
+
+  --color-morado: var(--color-morado);
+  --color-morado-50: var(--color-morado-50);
+  --color-morado-text: var(--color-morado-text);
+
+  --color-verde: var(--color-verde);
+  --color-verde-50: var(--color-verde-50);
+  --color-verde-text: var(--color-verde-text);
+
+  --color-amarillo: var(--color-amarillo);
+  --color-amarillo-50: var(--color-amarillo-50);
+  --color-amarillo-text: var(--color-amarillo-text);
+
+  --color-rojo: var(--color-rojo);
+  --color-rojo-50: var(--color-rojo-50);
+  --color-rojo-text: var(--color-rojo-text);
+
+  --color-validacion-text: var(--color-validacion-text);
+
+  --color-ink: var(--color-ink);
+  --color-texto-2: var(--color-texto-2);
+  --color-texto-3: var(--color-texto-3);
+  --color-texto-4: var(--color-texto-4);
+
+  --color-fondo-app: var(--color-fondo-app);
+  --color-fondo-pagina: var(--color-fondo-pagina);
+  --color-borde-card: var(--color-borde-card);
+  --color-borde-input: var(--color-borde-input);
+  --color-divisor: var(--color-divisor);
+  --color-track: var(--color-track);
+  --color-fila-destacada: var(--color-fila-destacada);
+
+  --radius-pill: 999px;
+  --radius-card: 18px;
+  --radius-card-sm: 12px;
+  --radius-tile: 14px;
+  --radius-sheet: 28px;
+
+  --shadow-frame: 0 30px 60px -20px rgba(58, 36, 64, .35);
+  --shadow-popover: 0 12px 30px rgba(58, 36, 64, .25);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-fondo-pagina);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3, h4, .font-heading {
+  font-family: var(--font-heading);
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
 }

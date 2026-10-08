@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kokun Daycare & Preschool — Plataforma escolar
 
-## Getting Started
+Prototipo funcional de una plataforma escolar para **Kokun Daycare & Preschool**, con tres experiencias independientes dentro de la misma app:
 
-First, run the development server:
+- **Papás** (`/papas`) — resumen del día, ficha del hijo, calendario de eventos, avisos y pagos.
+- **Docentes** (`/docentes`) — pase de lista, bitácora diaria (comidas, siesta, pañal, actividades), resúmenes para padres.
+- **Administración** (`/admin`) — avisos, eventos, cobranza y conciliación de pagos.
+
+Construido con **Next.js 16 (App Router) + TypeScript + Tailwind CSS v4 + Prisma 6 + SQLite + NextAuth v5**.
+
+## Requisitos
+
+- Node.js 20+
+- npm
+
+## Puesta en marcha
 
 ```bash
+npm install
+
+# genera el cliente de Prisma y aplica las migraciones
+npx prisma migrate deploy
+
+# carga datos de ejemplo (alumnos, grupos, eventos, cobranza, etc.)
+npm run db:seed
+
+# arranca el servidor de desarrollo
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre la URL que imprime `next dev` (por defecto [http://localhost:3000](http://localhost:3000)).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Crea un archivo `.env` en la raíz (no se versiona) con:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+DATABASE_URL="file:./prisma/dev.db"
+AUTH_SECRET="<valor aleatorio, p. ej. salida de `openssl rand -base64 32`>"
+```
 
-## Learn More
+## Cuentas de demostración
 
-To learn more about Next.js, take a look at the following resources:
+Contraseña para todas: **`kokun2026`**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Rol | Correo |
+| --- | --- |
+| Tutora (varios hijos) | `mariana.lopez@example.com` |
+| Docente | `ana.torres@kokun.mx` |
+| Dirección | `direccion@kokun.mx` |
+| Administración | `administracion@kokun.mx` |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Notas
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Las fechas de los datos de ejemplo están ancladas a una fecha "hoy" fija dentro del seed, para que el calendario y la bitácora diaria siempre muestren contenido relevante.
+- `prisma/dev.db` no se versiona; se regenera con los comandos de arriba.
