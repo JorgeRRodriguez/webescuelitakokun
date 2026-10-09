@@ -28,7 +28,7 @@ model Level {
   id       String  @id @default(cuid())
   school   School  @relation(fields: [schoolId], references: [id])
   schoolId String
-  name     String // "Maternal" | "Kinder"
+  name     String // "Daycare" | "Kínder"
   groups   Group[]
 }
 
@@ -36,7 +36,7 @@ model Group {
   id        String             @id @default(cuid())
   level     Level              @relation(fields: [levelId], references: [id])
   levelId   String
-  name      String // "Colibríes"
+  name      String // "Daycare" | "Kinder 1" | "Kinder 2" | "Kinder 3"
   room      String // "Salón 2"
   schedule  String // "8:00 a 14:00"
   project   String // proyecto del periodo

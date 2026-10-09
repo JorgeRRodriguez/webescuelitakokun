@@ -5,7 +5,7 @@ import { loginAction, type LoginState } from "./actions";
 
 const DEMO_ACCOUNTS = [
   { label: "Tutora (varios hijos)", email: "mariana.lopez@example.com", color: "bg-magenta-50 text-magenta" },
-  { label: "Docente (Colibríes)", email: "ana.torres@kokun.mx", color: "bg-teal-50 text-teal-text" },
+  { label: "Docente (Daycare)", email: "ana.torres@kokun.mx", color: "bg-teal-50 text-teal-text" },
   { label: "Dirección", email: "direccion@kokun.mx", color: "bg-amarillo-50 text-amarillo-text" },
   { label: "Administración", email: "administracion@kokun.mx", color: "bg-verde-50 text-verde-text" },
 ];

@@ -56,17 +56,17 @@ async function main() {
     data: { name: "Kokun Daycare & Preschool", cycle: "2026-2027" },
   });
 
-  const maternal = await prisma.level.create({
-    data: { schoolId: school.id, name: "Maternal" },
+  const daycareLevel = await prisma.level.create({
+    data: { schoolId: school.id, name: "Daycare" },
   });
   const kinder = await prisma.level.create({
     data: { schoolId: school.id, name: "Kínder" },
   });
 
-  const colibries = await prisma.group.create({
+  const daycare = await prisma.group.create({
     data: {
-      levelId: maternal.id,
-      name: "Colibríes",
+      levelId: daycareLevel.id,
+      name: "Daycare",
       room: "Salón 2",
       schedule: "8:00 a 14:00",
       project: "Exploradores de colores",
@@ -85,24 +85,43 @@ async function main() {
     },
   });
 
-  const luciernagas = await prisma.group.create({
+  const kinderRoutine = [
+    { time: "8:00", activity: "Llegada y círculo de bienvenida", order: 1 },
+    { time: "9:00", activity: "Desayuno", order: 2 },
+    { time: "9:30", activity: "Proyecto de ciencias", order: 3 },
+    { time: "10:30", activity: "Patio", order: 4 },
+    { time: "11:30", activity: "Comida", order: 5 },
+    { time: "12:15", activity: "Descanso", order: 6 },
+    { time: "13:30", activity: "Lectura y cierre", order: 7 },
+  ];
+  const kinder1 = await prisma.group.create({
     data: {
       levelId: kinder.id,
-      name: "Luciérnagas",
+      name: "Kinder 1",
       room: "Salón 4",
       schedule: "8:00 a 14:30",
       project: "Pequeños científicos",
-      routine: {
-        create: [
-          { time: "8:00", activity: "Llegada y círculo de bienvenida", order: 1 },
-          { time: "9:00", activity: "Desayuno", order: 2 },
-          { time: "9:30", activity: "Proyecto de ciencias", order: 3 },
-          { time: "10:30", activity: "Patio", order: 4 },
-          { time: "11:30", activity: "Comida", order: 5 },
-          { time: "12:15", activity: "Descanso", order: 6 },
-          { time: "13:30", activity: "Lectura y cierre", order: 7 },
-        ],
-      },
+      routine: { create: kinderRoutine },
+    },
+  });
+  const kinder2 = await prisma.group.create({
+    data: {
+      levelId: kinder.id,
+      name: "Kinder 2",
+      room: "Salón 5",
+      schedule: "8:00 a 14:30",
+      project: "Pequeños científicos",
+      routine: { create: kinderRoutine },
+    },
+  });
+  const kinder3 = await prisma.group.create({
+    data: {
+      levelId: kinder.id,
+      name: "Kinder 3",
+      room: "Salón 6",
+      schedule: "8:00 a 14:30",
+      project: "Pequeños científicos",
+      routine: { create: kinderRoutine },
     },
   });
 
@@ -117,7 +136,7 @@ async function main() {
       attentionHours: "Lun a vie, 14:00–15:00",
       avatarInitials: "AL",
       avatarColor: "#B3166F",
-      assignments: { create: [{ groupId: colibries.id, roleLabel: "Titular" }] },
+      assignments: { create: [{ groupId: daycare.id, roleLabel: "Titular" }] },
     },
   });
   const karla = await prisma.staff.create({
@@ -130,7 +149,7 @@ async function main() {
       attentionHours: "Lun a vie, 14:00–15:00",
       avatarInitials: "KM",
       avatarColor: "#1E92B5",
-      assignments: { create: [{ groupId: colibries.id, roleLabel: "Auxiliar" }] },
+      assignments: { create: [{ groupId: daycare.id, roleLabel: "Auxiliar" }] },
     },
   });
   const paola = await prisma.staff.create({
@@ -139,11 +158,17 @@ async function main() {
       email: "paola.jimenez@kokun.mx",
       passwordHash,
       role: "DOCENTE",
-      bio: "Titular de Luciérnagas, enfocada en proyectos de ciencia y autonomía.",
+      bio: "Titular de Kínder (grupos 1, 2 y 3), enfocada en proyectos de ciencia y autonomía.",
       attentionHours: "Lun a vie, 14:30–15:30",
       avatarInitials: "PJ",
       avatarColor: "#5E9E1F",
-      assignments: { create: [{ groupId: luciernagas.id, roleLabel: "Titular" }] },
+      assignments: {
+        create: [
+          { groupId: kinder1.id, roleLabel: "Titular" },
+          { groupId: kinder2.id, roleLabel: "Titular" },
+          { groupId: kinder3.id, roleLabel: "Titular" },
+        ],
+      },
     },
   });
   await prisma.staff.create({
@@ -152,11 +177,17 @@ async function main() {
       email: "renata.solis@kokun.mx",
       passwordHash,
       role: "DOCENTE",
-      bio: "Auxiliar de Luciérnagas.",
+      bio: "Auxiliar de Kínder (grupos 1, 2 y 3).",
       attentionHours: "Lun a vie, 14:30–15:30",
       avatarInitials: "RS",
       avatarColor: "#F28C28",
-      assignments: { create: [{ groupId: luciernagas.id, roleLabel: "Auxiliar" }] },
+      assignments: {
+        create: [
+          { groupId: kinder1.id, roleLabel: "Auxiliar" },
+          { groupId: kinder2.id, roleLabel: "Auxiliar" },
+          { groupId: kinder3.id, roleLabel: "Auxiliar" },
+        ],
+      },
     },
   });
   await prisma.staff.create({
@@ -165,7 +196,7 @@ async function main() {
       email: "diego.perez@kokun.mx",
       passwordHash,
       role: "DOCENTE",
-      bio: "Profesor de música para maternal y kínder.",
+      bio: "Profesor de música para daycare y kínder.",
       attentionHours: "Mar y jue, 10:00–12:00",
       avatarInitials: "DP",
       avatarColor: "#7B4BA8",
@@ -246,12 +277,12 @@ async function main() {
     },
   });
 
-  // --- Alumnos Colibríes --------------------------------------------------
+  // --- Alumnos Daycare --------------------------------------------------
   const sofia = await prisma.child.create({
     data: {
       firstName: "Sofía",
       lastName: "Ramírez",
-      groupId: colibries.id,
+      groupId: daycare.id,
       birthDate: new Date("2023-11-02"),
       allergySevere: true,
       allergyDetail: "Alergia severa al cacahuate. Lleva EpiPen en su mochila.",
@@ -282,7 +313,7 @@ async function main() {
     data: {
       firstName: "Joaquín",
       lastName: "Ramírez",
-      groupId: luciernagas.id,
+      groupId: kinder1.id,
       birthDate: new Date("2021-04-18"),
       allergySevere: false,
       feedingNotes: "Sin restricciones alimentarias.",
@@ -304,6 +335,7 @@ async function main() {
     },
   });
 
+  type ChildRow = typeof sofia;
   type ChildSeed = {
     firstName: string;
     lastName: string;
@@ -312,7 +344,7 @@ async function main() {
     parentFirstName: string;
     parentRelationship: "Mamá" | "Papá";
   };
-  const otherColibries: ChildSeed[] = [
+  const otherDaycareKids: ChildSeed[] = [
     { firstName: "Mateo", lastName: "Herrera", avatarColor: "#1E92B5", parentFirstName: "Laura", parentRelationship: "Mamá" },
     { firstName: "Valentina", lastName: "Cruz", avatarColor: "#F28C28", parentFirstName: "Héctor", parentRelationship: "Papá" },
     { firstName: "Emiliano", lastName: "Vega", avatarColor: "#5E9E1F", parentFirstName: "Paulina", parentRelationship: "Mamá" },
@@ -322,13 +354,13 @@ async function main() {
     { firstName: "Leo", lastName: "Castillo", avatarColor: "#14806F", parentFirstName: "Andrea", parentRelationship: "Mamá" },
   ];
 
-  const colibriesChildren = [sofia];
-  for (const c of otherColibries) {
+  const daycareChildren: ChildRow[] = [sofia];
+  for (const c of otherDaycareKids) {
     const child = await prisma.child.create({
       data: {
         firstName: c.firstName,
         lastName: c.lastName,
-        groupId: colibries.id,
+        groupId: daycare.id,
         birthDate: new Date("2023-06-15"),
         allergySevere: false,
         allergyDetail: c.allergyDetail,
@@ -351,23 +383,27 @@ async function main() {
         },
       },
     });
-    colibriesChildren.push(child);
+    daycareChildren.push(child);
   }
 
-  const otherLuciernagas: ChildSeed[] = [
-    { firstName: "Daniela", lastName: "Flores", avatarColor: "#B3166F", parentFirstName: "Marco", parentRelationship: "Papá" },
-    { firstName: "Ximena", lastName: "Castro", avatarColor: "#F28C28", parentFirstName: "Fernanda", parentRelationship: "Mamá" },
-    { firstName: "Bruno", lastName: "Delgado", avatarColor: "#1E92B5", parentFirstName: "Alejandro", parentRelationship: "Papá" },
-    { firstName: "Renata", lastName: "Paredes", avatarColor: "#7B4BA8", parentFirstName: "Gabriela", parentRelationship: "Mamá" },
-    { firstName: "Diego", lastName: "Luna", avatarColor: "#C99700", parentFirstName: "Sergio", parentRelationship: "Papá" },
+  // Resto de Kínder, repartido 2 por grupo: Joaquín y Daniela en Kinder 1,
+  // Ximena y Bruno en Kinder 2, Renata y Diego en Kinder 3.
+  const otherKinderKids: (ChildSeed & { group: typeof kinder1 })[] = [
+    { firstName: "Daniela", lastName: "Flores", avatarColor: "#B3166F", parentFirstName: "Marco", parentRelationship: "Papá", group: kinder1 },
+    { firstName: "Ximena", lastName: "Castro", avatarColor: "#F28C28", parentFirstName: "Fernanda", parentRelationship: "Mamá", group: kinder2 },
+    { firstName: "Bruno", lastName: "Delgado", avatarColor: "#1E92B5", parentFirstName: "Alejandro", parentRelationship: "Papá", group: kinder2 },
+    { firstName: "Renata", lastName: "Paredes", avatarColor: "#7B4BA8", parentFirstName: "Gabriela", parentRelationship: "Mamá", group: kinder3 },
+    { firstName: "Diego", lastName: "Luna", avatarColor: "#C99700", parentFirstName: "Sergio", parentRelationship: "Papá", group: kinder3 },
   ];
-  const luciernagasChildren = [joaquin];
-  for (const c of otherLuciernagas) {
+  const kinder1Children: ChildRow[] = [joaquin];
+  const kinder2Children: ChildRow[] = [];
+  const kinder3Children: ChildRow[] = [];
+  for (const c of otherKinderKids) {
     const child = await prisma.child.create({
       data: {
         firstName: c.firstName,
         lastName: c.lastName,
-        groupId: luciernagas.id,
+        groupId: c.group.id,
         birthDate: new Date("2021-08-20"),
         allergySevere: false,
         feedingNotes: "Sin restricciones alimentarias.",
@@ -388,10 +424,12 @@ async function main() {
         },
       },
     });
-    luciernagasChildren.push(child);
+    if (c.group.id === kinder1.id) kinder1Children.push(child);
+    else if (c.group.id === kinder2.id) kinder2Children.push(child);
+    else kinder3Children.push(child);
   }
 
-  // --- Asistencia de hoy (Colibríes) --------------------------------------
+  // --- Asistencia de hoy (Daycare) --------------------------------------
   await prisma.attendance.create({
     data: {
       childId: sofia.id,
@@ -402,13 +440,13 @@ async function main() {
       registeredById: anaLucia.id,
     },
   });
-  const colibriesPresenceData = [
-    { child: colibriesChildren[1], time: "7:55", by: "Papá" },
-    { child: colibriesChildren[2], time: "8:10", by: "Mamá" },
-    { child: colibriesChildren[3], time: "8:02", by: "Mamá" },
-    { child: colibriesChildren[4], time: "8:20", by: "Abuela" },
+  const daycarePresenceData = [
+    { child: daycareChildren[1], time: "7:55", by: "Papá" },
+    { child: daycareChildren[2], time: "8:10", by: "Mamá" },
+    { child: daycareChildren[3], time: "8:02", by: "Mamá" },
+    { child: daycareChildren[4], time: "8:20", by: "Abuela" },
   ];
-  for (const p of colibriesPresenceData) {
+  for (const p of daycarePresenceData) {
     await prisma.attendance.create({
       data: {
         childId: p.child.id,
@@ -422,7 +460,7 @@ async function main() {
   }
   await prisma.attendance.create({
     data: {
-      childId: colibriesChildren[5].id, // Santiago ausente
+      childId: daycareChildren[5].id, // Santiago ausente
       date: onDay(0),
       status: "AUSENTE",
       registeredById: anaLucia.id,
@@ -430,9 +468,9 @@ async function main() {
   });
   // Camila y Leo sin registro aún (no se crea Attendance)
 
-  // --- Captura del día (Colibríes) ----------------------------------------
-  const batch1 = "batch-desayuno-colibries";
-  const presentChildren = [sofia, colibriesChildren[1], colibriesChildren[2], colibriesChildren[3], colibriesChildren[4]];
+  // --- Captura del día (Daycare) ----------------------------------------
+  const batch1 = "batch-desayuno-daycare";
+  const presentChildren = [sofia, daycareChildren[1], daycareChildren[2], daycareChildren[3], daycareChildren[4]];
   for (const child of presentChildren) {
     await prisma.dailyEntry.create({
       data: {
@@ -448,7 +486,7 @@ async function main() {
       },
     });
   }
-  const batch2 = "batch-pañal-colibries";
+  const batch2 = "batch-pañal-daycare";
   for (const child of presentChildren) {
     await prisma.dailyEntry.create({
       data: {
@@ -473,7 +511,7 @@ async function main() {
       startTime: at("12:05"),
       endTime: at("13:10"),
       authorId: anaLucia.id,
-      batchId: "batch-siesta-colibries",
+      batchId: "batch-siesta-daycare",
     },
   });
   await prisma.dailyEntry.create({
@@ -485,7 +523,7 @@ async function main() {
       title: "Pintura con los dedos",
       detail: "Exploramos los colores primarios mezclándolos con las manos.",
       authorId: anaLucia.id,
-      batchId: "batch-actividad-colibries",
+      batchId: "batch-actividad-daycare",
     },
   });
   await prisma.dailyEntry.create({
@@ -517,14 +555,14 @@ async function main() {
   });
   await prisma.dailySummary.create({
     data: {
-      childId: colibriesChildren[1].id,
+      childId: daycareChildren[1].id,
       date: onDay(0),
       status: "POR_REVISAR",
     },
   });
   await prisma.dailySummary.create({
     data: {
-      childId: colibriesChildren[2].id,
+      childId: daycareChildren[2].id,
       date: onDay(0),
       mood: "Tranquila",
       note: "Día tranquilo, durmió bien su siesta.",
@@ -538,9 +576,9 @@ async function main() {
   const noticeAutorizacion = await prisma.notice.create({
     data: {
       title: "Salida al Parque Ecológico",
-      body: "El viernes 16 de octubre saldremos con el grupo Colibríes al Parque Ecológico de 9:00 a 12:00. Necesitamos tu autorización para que tu hija/o pueda participar.",
+      body: "El viernes 16 de octubre saldremos con el grupo Daycare al Parque Ecológico de 9:00 a 12:00. Necesitamos tu autorización para que tu hija/o pueda participar.",
       audienceScope: "GRUPO",
-      groupId: colibries.id,
+      groupId: daycare.id,
       responseType: "AUTORIZACION",
       dueAt: onDay(7),
       createdAt: onDay(-1),
@@ -558,7 +596,7 @@ async function main() {
       respondedAt: at("12:31"),
     },
   });
-  for (const child of colibriesChildren.slice(1)) {
+  for (const child of daycareChildren.slice(1)) {
     const guardianRecord = await prisma.childGuardian.findFirst({ where: { childId: child.id } });
     if (!guardianRecord) continue;
     await prisma.noticeRecipient.create({
@@ -621,19 +659,24 @@ async function main() {
   // --- Calendario (agenda de octubre 2026) ------------------------------------
   // TODAY = 6 de octubre de 2026, así que los offsets de onDay(...) se calculan
   // como "día del mes - 6" para anclar cada evento a su fecha real en el calendario.
+  // Como el modelo Event no soporta un scope "por nivel" (solo PLANTEL o GRUPO),
+  // los eventos que aplican a todo Kínder se crean una vez POR CADA uno de los
+  // 3 grupos (groupIds con varios ids) para que las 3 familias los vean.
   type EventSeed = {
     title: string;
     description: string;
     type: "ESCUELA" | "GRUPO" | "MATERIAL";
     dayOffset: number;
     scope: "PLANTEL" | "GRUPO";
-    groupId?: string;
+    groupIds?: string[];
     rsvpRequired?: boolean;
     // a quién de la familia demo (Mariana) le marcamos recordatorio/confirmación
     marianaChild?: "sofia" | "joaquin" | "ambos";
     reminder?: boolean;
     rsvp?: "ASISTIRE" | "NO_PODRE";
   };
+
+  const allKinderGroupIds = [kinder1.id, kinder2.id, kinder3.id];
 
   const eventSeeds: EventSeed[] = [
     {
@@ -642,7 +685,7 @@ async function main() {
       type: "GRUPO",
       dayOffset: 1 - 6,
       scope: "GRUPO",
-      groupId: luciernagas.id,
+      groupIds: allKinderGroupIds,
       rsvpRequired: true,
     },
     {
@@ -651,7 +694,7 @@ async function main() {
       type: "GRUPO",
       dayOffset: 2 - 6,
       scope: "GRUPO",
-      groupId: luciernagas.id,
+      groupIds: allKinderGroupIds,
       rsvpRequired: true,
     },
     {
@@ -660,7 +703,7 @@ async function main() {
       type: "GRUPO",
       dayOffset: 3 - 6,
       scope: "GRUPO",
-      groupId: colibries.id,
+      groupIds: [daycare.id],
     },
     {
       title: "🎂 Cumpleaños de Diego Luna",
@@ -668,7 +711,7 @@ async function main() {
       type: "GRUPO",
       dayOffset: 4 - 6,
       scope: "GRUPO",
-      groupId: luciernagas.id,
+      groupIds: [kinder3.id],
     },
     {
       title: "Club de lectura LIFE — Capítulo 1",
@@ -676,7 +719,7 @@ async function main() {
       type: "GRUPO",
       dayOffset: 5 - 6,
       scope: "GRUPO",
-      groupId: luciernagas.id,
+      groupIds: allKinderGroupIds,
     },
     {
       title: "Conferencia para padres: Cuidado del cuerpo",
@@ -695,7 +738,7 @@ async function main() {
       type: "GRUPO",
       dayOffset: 12 - 6,
       scope: "GRUPO",
-      groupId: luciernagas.id,
+      groupIds: allKinderGroupIds,
     },
     {
       title: "Taller para padres: Cuidado del cuerpo",
@@ -711,7 +754,7 @@ async function main() {
       type: "GRUPO",
       dayOffset: 19 - 6,
       scope: "GRUPO",
-      groupId: colibries.id,
+      groupIds: [daycare.id],
     },
     {
       title: "Club de lectura LIFE — Capítulos 3 y 4",
@@ -719,15 +762,15 @@ async function main() {
       type: "GRUPO",
       dayOffset: 20 - 6,
       scope: "GRUPO",
-      groupId: luciernagas.id,
+      groupIds: allKinderGroupIds,
     },
     {
       title: "Plática Pre-first Kokun",
-      description: "Información sobre el tránsito de Kínder a primaria, dirigida a familias de último grado.",
+      description: "Información sobre el tránsito de Kínder a primaria, dirigida a familias de Kínder.",
       type: "GRUPO",
       dayOffset: 21 - 6,
       scope: "GRUPO",
-      groupId: luciernagas.id,
+      groupIds: allKinderGroupIds,
       rsvpRequired: true,
       marianaChild: "joaquin",
     },
@@ -737,7 +780,7 @@ async function main() {
       type: "GRUPO",
       dayOffset: 23 - 6,
       scope: "GRUPO",
-      groupId: colibries.id,
+      groupIds: [daycare.id],
     },
     {
       title: "🎂 Cumpleaños de Ximena Castro",
@@ -745,7 +788,7 @@ async function main() {
       type: "GRUPO",
       dayOffset: 25 - 6,
       scope: "GRUPO",
-      groupId: luciernagas.id,
+      groupIds: [kinder2.id],
     },
     {
       title: "Traer objetos para la ofrenda",
@@ -774,43 +817,54 @@ async function main() {
   ];
 
   for (const seed of eventSeeds) {
-    const event = await prisma.event.create({
-      data: {
-        title: seed.title,
-        description: seed.description,
-        type: seed.type,
-        date: onDay(seed.dayOffset),
-        audienceScope: seed.scope,
-        groupId: seed.scope === "GRUPO" ? seed.groupId : null,
-        rsvpRequired: seed.rsvpRequired ?? false,
-      },
-    });
+    const rowGroupIds: (string | null)[] = seed.scope === "GRUPO" ? seed.groupIds ?? [] : [null];
 
-    const marianaChildIds =
-      seed.marianaChild === "ambos"
-        ? [sofia.id, joaquin.id]
-        : seed.marianaChild === "sofia"
-          ? [sofia.id]
-          : seed.marianaChild === "joaquin"
-            ? [joaquin.id]
-            : seed.scope === "GRUPO" && seed.groupId === colibries.id
-              ? [sofia.id]
-              : seed.scope === "GRUPO" && seed.groupId === luciernagas.id
-                ? [joaquin.id]
-                : seed.scope === "PLANTEL"
-                  ? [sofia.id, joaquin.id]
-                  : [];
-
-    for (const childId of marianaChildIds) {
-      await prisma.eventGuardian.create({
+    for (const groupId of rowGroupIds) {
+      const event = await prisma.event.create({
         data: {
-          eventId: event.id,
-          guardianId: mariana.id,
-          childId,
-          reminder: seed.reminder ?? false,
-          rsvp: seed.rsvp ?? null,
+          title: seed.title,
+          description: seed.description,
+          type: seed.type,
+          date: onDay(seed.dayOffset),
+          audienceScope: seed.scope,
+          groupId,
+          rsvpRequired: seed.rsvpRequired ?? false,
         },
       });
+
+      // Solo se adjunta el recordatorio/RSVP demo de Mariana a la fila de
+      // evento que corresponde al grupo real del hijo (relevante cuando el
+      // evento se repitió para varios grupos de Kínder a la vez).
+      const marianaChildIds =
+        seed.marianaChild === "ambos"
+          ? [sofia.id, joaquin.id]
+          : seed.marianaChild === "sofia"
+            ? groupId === null || groupId === sofia.groupId
+              ? [sofia.id]
+              : []
+            : seed.marianaChild === "joaquin"
+              ? groupId === null || groupId === joaquin.groupId
+                ? [joaquin.id]
+                : []
+              : seed.scope === "GRUPO" && groupId === sofia.groupId
+                ? [sofia.id]
+                : seed.scope === "GRUPO" && groupId === joaquin.groupId
+                  ? [joaquin.id]
+                  : seed.scope === "PLANTEL"
+                    ? [sofia.id, joaquin.id]
+                    : [];
+
+      for (const childId of marianaChildIds) {
+        await prisma.eventGuardian.create({
+          data: {
+            eventId: event.id,
+            guardianId: mariana.id,
+            childId,
+            reminder: seed.reminder ?? false,
+            rsvp: seed.rsvp ?? null,
+          },
+        });
+      }
     }
   }
 
@@ -831,7 +885,7 @@ async function main() {
   }
 
   // --- Cargos y pagos --------------------------------------------------------
-  const allChildren = [...colibriesChildren, ...luciernagasChildren];
+  const allChildren = [...daycareChildren, ...kinder1Children, ...kinder2Children, ...kinder3Children];
   for (const child of allChildren) {
     await prisma.charge.create({
       data: {
@@ -921,7 +975,7 @@ async function main() {
   });
 
   // otro padre con pago SPEI en validación para poblar Conciliación
-  const otherChild = colibriesChildren[2];
+  const otherChild = daycareChildren[2];
   const otherGuardianLink = await prisma.childGuardian.findFirst({ where: { childId: otherChild.id } });
   if (otherGuardianLink) {
     const chargeOtherCol = await prisma.charge.findFirst({
