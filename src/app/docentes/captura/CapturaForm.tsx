@@ -26,7 +26,7 @@ export function CapturaForm({ students }: { students: ChildOption[] }) {
   const [activityTitle, setActivityTitle] = useState("");
   const [activityDesc, setActivityDesc] = useState("");
   const [observation, setObservation] = useState("");
-  const [exceptions, setExceptions] = useState<Record<string, string>>({});
+  const [exceptions, setExceptions] = useState<Record<string, string[]>>({});
   const [pending, startTransition] = useTransition();
   const { showToast } = useToast();
 
@@ -40,16 +40,32 @@ export function CapturaForm({ students }: { students: ChildOption[] }) {
 
   const hasExceptionsRow = type === "COMIDA" || type === "PANIAL";
   const exceptionOptions = type === "COMIDA" ? MEAL_PORTIONS : DIAPER_STATES;
-  const defaultException = type === "COMIDA" ? "Todo" : "Mojado";
+  const isMultiSelect = type === "PANIAL";
+  const defaultExceptions = useMemo(() => (type === "COMIDA" ? ["Todo"] : []), [type]);
 
   const selectedChildren = students.filter((c) => selected.includes(c.id));
+
+  function exceptionsFor(childId: string) {
+    return exceptions[childId] ?? defaultExceptions;
+  }
+
+  function toggleException(childId: string, opt: string) {
+    setExceptions((e) => {
+      const current = e[childId] ?? defaultExceptions;
+      if (!isMultiSelect) return { ...e, [childId]: [opt] };
+      const next = current.includes(opt) ? current.filter((v) => v !== opt) : [...current, opt];
+      return { ...e, [childId]: next };
+    });
+  }
 
   const isValid = useMemo(() => {
     if (!type || selected.length === 0) return false;
     if (type === "ACTIVIDAD" && !activityTitle.trim()) return false;
     if (type === "OBSERVACION" && !observation.trim()) return false;
+    if (type === "PANIAL" && selectedChildren.some((c) => exceptionsFor(c.id).length === 0)) return false;
     return true;
-  }, [type, selected, activityTitle, observation]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [type, selected, activityTitle, observation, exceptions]);
 
   function buildPayload() {
     if (!type) return null;
@@ -71,7 +87,7 @@ export function CapturaForm({ students }: { students: ChildOption[] }) {
 
   function fillExceptions() {
     const result: Record<string, string> = {};
-    for (const c of selectedChildren) result[c.id] = exceptions[c.id] ?? defaultException;
+    for (const c of selectedChildren) result[c.id] = exceptionsFor(c.id).join(", ");
     return result;
   }
 
@@ -259,12 +275,11 @@ export function CapturaForm({ students }: { students: ChildOption[] }) {
                     </span>
                     <div className="flex gap-1">
                       {exceptionOptions.map((opt) => {
-                        const value = exceptions[c.id] ?? defaultException;
-                        const active = value === opt;
+                        const active = exceptionsFor(c.id).includes(opt);
                         return (
                           <button
                             key={opt}
-                            onClick={() => setExceptions((e) => ({ ...e, [c.id]: opt }))}
+                            onClick={() => toggleException(c.id, opt)}
                             className={clsx(
                               "rounded-pill px-2 py-1 text-[11px] font-bold border",
                               active ? "bg-magenta-50 border-magenta text-magenta" : "border-borde-input text-texto-2"

@@ -182,7 +182,7 @@ model DailyEntry {
   time           DateTime
   title          String
   detail         String?
-  exceptionValue String? // "Mitad" | "Poco" | "Nada" | "Mojado" | "Sucio" | "Usó baño" ...
+  exceptionValue String? // comida: "Todo"|"Mitad"|"Poco"|"Nada"; pañal: una o más de "Pipi","Popo","Accidente" unidas con ", "
   startTime      DateTime?
   endTime        DateTime?
   photoUrl       String?

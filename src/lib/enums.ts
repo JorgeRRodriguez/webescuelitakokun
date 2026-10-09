@@ -25,7 +25,7 @@ export const DAILY_ENTRY_TYPE_COLOR: Record<DailyEntryType, { bg50: string; text
 };
 
 export const MEAL_PORTIONS = ["Todo", "Mitad", "Poco", "Nada"] as const;
-export const DIAPER_STATES = ["Mojado", "Sucio", "Seco", "Usó baño"] as const;
+export const DIAPER_STATES = ["Pipi", "Popo", "Accidente"] as const;
 
 export const SUMMARY_STATUS = ["SIN_REGISTROS", "POR_REVISAR", "ENVIADO", "VISTO"] as const;
 export type SummaryStatus = (typeof SUMMARY_STATUS)[number];

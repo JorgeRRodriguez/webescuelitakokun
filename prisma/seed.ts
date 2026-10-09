@@ -457,7 +457,7 @@ async function main() {
         type: "PANIAL",
         time: at("10:45"),
         title: "Cambio de pañal",
-        exceptionValue: child.id === sofia.id ? "Mojado" : "Seco",
+        exceptionValue: child.id === sofia.id ? "Pipi" : "Popo",
         authorId: anaLucia.id,
         batchId: batch2,
       },
