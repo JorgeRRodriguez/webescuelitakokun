@@ -3,7 +3,8 @@
 import { useState, useTransition } from "react";
 import clsx from "clsx";
 import { useToast } from "@/components/Toast";
-import { payWithCard, paySpei } from "./actions";
+import { PAYMENT_METHOD_LABEL, type PaymentMethod } from "@/lib/enums";
+import { payWithCard, paySpei, payEfectivo } from "./actions";
 
 export type ChargeItem = {
   id: string;
@@ -13,7 +14,7 @@ export type ChargeItem = {
   dueAtLabel: string;
   overdue: boolean;
   status: "PENDIENTE" | "VALIDACION" | "PAGADO" | "CANCELADO";
-  paymentMethod: "TARJETA" | "SPEI" | "CAJA" | null;
+  paymentMethod: PaymentMethod | null;
   paymentDateLabel: string | null;
 };
 
@@ -109,7 +110,7 @@ export function PagosView({
                 <p className="text-sm font-bold">{i.conceptName}</p>
                 <p className="text-[11px] text-texto-3">
                   {i.period}
-                  {i.paymentMethod ? ` · ${i.paymentMethod}` : ""}
+                  {i.paymentMethod ? ` · ${PAYMENT_METHOD_LABEL[i.paymentMethod]}` : ""}
                   {i.paymentDateLabel ? ` · ${i.paymentDateLabel}` : ""}
                 </p>
               </div>
@@ -135,8 +136,10 @@ export function PagosView({
   );
 }
 
+type SheetStep = "metodo" | "tarjeta" | "spei" | "efectivo" | "confirmado-tarjeta" | "confirmado-spei" | "confirmado-efectivo";
+
 function PaymentSheet({ chargeIds, total, onClose }: { chargeIds: string[]; total: number; onClose: () => void }) {
-  const [step, setStep] = useState<"metodo" | "tarjeta" | "spei" | "confirmado-tarjeta" | "confirmado-spei">("metodo");
+  const [step, setStep] = useState<SheetStep>("metodo");
   const [reference, setReference] = useState("");
   const [proofName, setProofName] = useState<string | null>(null);
   const [folio, setFolio] = useState<string | null>(null);
@@ -160,6 +163,15 @@ function PaymentSheet({ chargeIds, total, onClose }: { chargeIds: string[]; tota
     });
   }
 
+  function reportEfectivo() {
+    startTransition(async () => {
+      const f = await payEfectivo(chargeIds);
+      setFolio(f);
+      setStep("confirmado-efectivo");
+      showToast("Avisamos al plantel de tu pago en efectivo");
+    });
+  }
+
   return (
     <div className="fixed inset-0 z-[100] flex items-end justify-center">
       <div className="absolute inset-0 bg-[rgba(35,26,38,.45)]" onClick={onClose} />
@@ -172,6 +184,9 @@ function PaymentSheet({ chargeIds, total, onClose }: { chargeIds: string[]; tota
             </button>
             <button onClick={() => setStep("spei")} className="rounded-card border border-borde-card p-3.5 text-left font-bold">
               🏦 Transferencia SPEI
+            </button>
+            <button onClick={() => setStep("efectivo")} className="rounded-card border border-borde-card p-3.5 text-left font-bold">
+              💵 Pago en efectivo
             </button>
           </>
         )}
@@ -216,9 +231,34 @@ function PaymentSheet({ chargeIds, total, onClose }: { chargeIds: string[]; tota
           </>
         )}
 
+        {step === "efectivo" && (
+          <>
+            <h2 className="font-heading font-bold text-xl">Pago en efectivo</h2>
+            <div className="rounded-card-sm bg-magenta-25 p-3 text-sm">
+              <p>Puedes pagar en la caja de recepción del plantel, de lunes a viernes de 8:00 a 15:00.</p>
+              <p className="mt-1">
+                <b>Folio para caja:</b> KOKUN-{chargeIds[0]?.slice(-6) ?? "000000"}
+              </p>
+              <p className="mt-1">
+                <b>Monto a pagar:</b> {money(total)}
+              </p>
+            </div>
+            <p className="text-xs text-texto-3">
+              Avisa al plantel que ya vas a pagar; el cargo quedará &quot;En validación&quot; hasta que recepción confirme que recibió tu efectivo.
+            </p>
+            <button
+              onClick={reportEfectivo}
+              disabled={pending}
+              className="rounded-pill bg-magenta text-white font-extrabold text-sm py-2.5 disabled:opacity-45"
+            >
+              Ya voy a pagar en caja
+            </button>
+          </>
+        )}
+
         {step === "confirmado-tarjeta" && (
-          <div className="rounded-card bg-verde-50 p-4 text-center">
-            <p className="font-extrabold text-verde-text">Pago confirmado · Folio {folio}</p>
+          <div className="rounded-card bg-amarillo-50 p-4 text-center">
+            <p className="font-extrabold text-amarillo-text">Pago registrado · Folio {folio} · En validación</p>
           </div>
         )}
         {step === "confirmado-spei" && (
@@ -226,8 +266,13 @@ function PaymentSheet({ chargeIds, total, onClose }: { chargeIds: string[]; tota
             <p className="font-extrabold text-amarillo-text">Comprobante enviado… En validación</p>
           </div>
         )}
+        {step === "confirmado-efectivo" && (
+          <div className="rounded-card bg-amarillo-50 p-4 text-center">
+            <p className="font-extrabold text-amarillo-text">Pago en efectivo registrado · Folio {folio} · En validación</p>
+          </div>
+        )}
 
-        {(step === "confirmado-tarjeta" || step === "confirmado-spei") && (
+        {(step === "confirmado-tarjeta" || step === "confirmado-spei" || step === "confirmado-efectivo") && (
           <button onClick={onClose} className="rounded-pill border border-borde-input text-sm font-extrabold py-2.5">
             Cerrar
           </button>

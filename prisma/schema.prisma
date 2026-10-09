@@ -308,7 +308,7 @@ model Payment {
   id              String              @id @default(cuid())
   guardian        Guardian            @relation(fields: [guardianId], references: [id])
   guardianId      String
-  method          String // "TARJETA" | "SPEI" | "CAJA"
+  method          String // "TARJETA" | "SPEI" | "EFECTIVO"
   reference       String?
   proofUrl        String?
   amount          Float

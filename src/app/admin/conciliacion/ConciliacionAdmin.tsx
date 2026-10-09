@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import clsx from "clsx";
 import { useToast } from "@/components/Toast";
+import { PAYMENT_METHOD_LABEL, type PaymentMethod } from "@/lib/enums";
 import { confirmPayment, rejectPayment } from "./actions";
 
 export type PaymentRow = {
@@ -10,7 +11,7 @@ export type PaymentRow = {
   dateLabel: string;
   familyName: string;
   appliesTo: string;
-  method: "TARJETA" | "SPEI" | "CAJA";
+  method: PaymentMethod;
   reference: string | null;
   amount: number;
   status: "VALIDACION" | "CONFIRMADO" | "RECHAZADO";
@@ -87,7 +88,7 @@ function Row({ row }: { row: PaymentRow }) {
       <td className="px-3 py-2.5">{row.dateLabel}</td>
       <td className="px-3 py-2.5 font-bold">{row.familyName}</td>
       <td className="px-3 py-2.5 text-texto-2">{row.appliesTo || "—"}</td>
-      <td className="px-3 py-2.5">{row.method}</td>
+      <td className="px-3 py-2.5">{PAYMENT_METHOD_LABEL[row.method]}</td>
       <td className="px-3 py-2.5 text-texto-3">{row.reference ?? "—"}{row.folio ? ` · ${row.folio}` : ""}</td>
       <td className="px-3 py-2.5 font-bold">{money(row.amount)}</td>
       <td className="px-3 py-2.5">

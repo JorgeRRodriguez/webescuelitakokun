@@ -62,8 +62,14 @@ export type AttendanceStatus = (typeof ATTENDANCE_STATUS)[number];
 export const CHARGE_STATUS = ["PENDIENTE", "VALIDACION", "PAGADO", "CANCELADO"] as const;
 export type ChargeStatus = (typeof CHARGE_STATUS)[number];
 
-export const PAYMENT_METHODS = ["TARJETA", "SPEI", "CAJA"] as const;
+export const PAYMENT_METHODS = ["TARJETA", "SPEI", "EFECTIVO"] as const;
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
+
+export const PAYMENT_METHOD_LABEL: Record<PaymentMethod, string> = {
+  TARJETA: "Tarjeta",
+  SPEI: "SPEI",
+  EFECTIVO: "Efectivo",
+};
 
 export const PAYMENT_STATUS = ["VALIDACION", "CONFIRMADO", "RECHAZADO"] as const;
 export type PaymentStatus = (typeof PAYMENT_STATUS)[number];
