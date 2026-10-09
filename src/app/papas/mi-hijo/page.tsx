@@ -48,6 +48,7 @@ export default async function MiHijoPage() {
   }));
 
   const data = {
+    childId: child.id,
     child: {
       firstName: child.firstName,
       lastName: child.lastName,

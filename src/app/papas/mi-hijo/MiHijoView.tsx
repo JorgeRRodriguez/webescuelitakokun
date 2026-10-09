@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Segmented } from "@/components/Segmented";
 import { Avatar } from "@/components/Avatar";
 import { useToast } from "@/components/Toast";
-import { togglePermission } from "./actions";
+import { togglePermission, addFamilyMember } from "./actions";
 
 type Data = {
+  childId: string;
   child: {
     firstName: string;
     lastName: string;
@@ -45,6 +46,7 @@ type Tab = (typeof TABS)[number]["value"];
 
 export function MiHijoView({ data }: { data: Data }) {
   const [tab, setTab] = useState<Tab>("profesores");
+  const [addOpen, setAddOpen] = useState(false);
   const { showToast } = useToast();
 
   return (
@@ -204,6 +206,16 @@ export function MiHijoView({ data }: { data: Data }) {
           {data.family.map((f) => (
             <FamilyCard key={f.childGuardianId} f={f} />
           ))}
+
+          <button
+            onClick={() => setAddOpen((o) => !o)}
+            className="self-start rounded-pill bg-magenta text-white font-extrabold text-sm px-4 py-2.5"
+          >
+            {addOpen ? "Cancelar" : "+ Agregar persona"}
+          </button>
+
+          {addOpen && <AddFamilyMemberForm childId={data.childId} onDone={() => setAddOpen(false)} />}
+
           <p className="text-[11px] text-texto-4">Recepción verifica identificación oficial al entregar.</p>
         </div>
       )}
@@ -265,6 +277,103 @@ function FamilyCard({
             </button>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+function AddFamilyMemberForm({ childId, onDone }: { childId: string; onDone: () => void }) {
+  const [name, setName] = useState("");
+  const [relationshipLabel, setRelationshipLabel] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [receivesComms, setReceivesComms] = useState(true);
+  const [canPickUp, setCanPickUp] = useState(false);
+  const [canPay, setCanPay] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+  const { showToast } = useToast();
+
+  const atLeastOnePermission = receivesComms || canPickUp || canPay;
+  const isValid = name.trim() !== "" && relationshipLabel.trim() !== "" && email.trim() !== "" && atLeastOnePermission;
+
+  function submit() {
+    setError(null);
+    startTransition(async () => {
+      try {
+        const result = await addFamilyMember(childId, { name, relationshipLabel, email, phone, receivesComms, canPickUp, canPay });
+        showToast(
+          result.isNewAccount
+            ? `Agregado. Puede entrar con ${result.email} y contraseña kokun2026`
+            : "Persona vinculada a este alumno"
+        );
+        onDone();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "No se pudo agregar a esta persona.");
+      }
+    });
+  }
+
+  const chips: { key: "receivesComms" | "canPickUp" | "canPay"; label: string; value: boolean; set: (v: boolean) => void }[] = [
+    { key: "receivesComms", label: "Comunicaciones", value: receivesComms, set: setReceivesComms },
+    { key: "canPickUp", label: "Puede recoger", value: canPickUp, set: setCanPickUp },
+    { key: "canPay", label: "Pagos", value: canPay, set: setCanPay },
+  ];
+
+  return (
+    <div className="rounded-card bg-white border-2 border-magenta p-4 flex flex-col gap-3">
+      <h2 className="font-heading font-bold text-lg">Agregar persona</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <label className="flex flex-col gap-1">
+          <span className="text-[11px] font-extrabold uppercase text-texto-3">Nombre</span>
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nombre completo" className="rounded-[10px] border border-borde-input px-3 py-2 text-sm" />
+        </label>
+        <label className="flex flex-col gap-1">
+          <span className="text-[11px] font-extrabold uppercase text-texto-3">Parentesco</span>
+          <input value={relationshipLabel} onChange={(e) => setRelationshipLabel(e.target.value)} placeholder="Abuela, niñera…" className="rounded-[10px] border border-borde-input px-3 py-2 text-sm" />
+        </label>
+        <label className="flex flex-col gap-1">
+          <span className="text-[11px] font-extrabold uppercase text-texto-3">Correo</span>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="correo@ejemplo.com" className="rounded-[10px] border border-borde-input px-3 py-2 text-sm" />
+        </label>
+        <label className="flex flex-col gap-1">
+          <span className="text-[11px] font-extrabold uppercase text-texto-3">Teléfono (opcional)</span>
+          <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="55 1234 5678" className="rounded-[10px] border border-borde-input px-3 py-2 text-sm" />
+        </label>
+      </div>
+
+      <div>
+        <p className="text-[11px] font-extrabold uppercase text-texto-3 mb-1.5">¿De qué se encargará?</p>
+        <div className="flex flex-wrap gap-1.5">
+          {chips.map((c) => (
+            <button
+              key={c.key}
+              type="button"
+              onClick={() => c.set(!c.value)}
+              className={`rounded-pill px-2.5 py-1 text-[11px] font-extrabold border ${
+                c.value ? "bg-verde-50 border-verde/40 text-verde-text" : "bg-track border-transparent text-texto-4"
+              }`}
+            >
+              {c.value ? "✓ " : ""}
+              {c.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {error && <p className="text-xs font-bold text-rojo-text">{error}</p>}
+
+      <div className="flex gap-2">
+        <button onClick={onDone} className="rounded-pill border border-borde-input text-sm font-extrabold px-4 py-2.5 text-texto-2">
+          Cancelar
+        </button>
+        <button
+          onClick={submit}
+          disabled={pending || !isValid}
+          className="rounded-pill bg-magenta text-white font-extrabold text-sm px-5 py-2.5 disabled:opacity-45"
+        >
+          Agregar
+        </button>
       </div>
     </div>
   );
