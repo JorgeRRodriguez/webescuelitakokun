@@ -3,9 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { ConceptosAdmin } from "./ConceptosAdmin";
 
 export default async function ConceptosPage() {
-  const session = await requireRole(["ADMIN", "DIRECCION", "RECEPCION"]);
+  const session = await requireRole(["ADMIN", "RECEPCION"]);
   const concepts = await prisma.concept.findMany({ orderBy: { key: "asc" } });
-  const canEdit = session.user.role === "ADMIN" || session.user.role === "DIRECCION";
+  const canEdit = session.user.role === "ADMIN";
 
   return (
     <main className="p-4 md:p-6 flex flex-col gap-4">

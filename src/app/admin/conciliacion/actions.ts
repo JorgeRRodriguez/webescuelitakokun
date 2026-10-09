@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/guards";
 
 export async function confirmPayment(paymentId: string) {
-  const session = await requireRole(["ADMIN", "DIRECCION"]);
+  const session = await requireRole(["ADMIN"]);
   const payment = await prisma.payment.findUnique({ where: { id: paymentId }, include: { allocations: true } });
   if (!payment) throw new Error("Pago no encontrado.");
 
@@ -25,7 +25,7 @@ export async function confirmPayment(paymentId: string) {
 }
 
 export async function rejectPayment(paymentId: string) {
-  const session = await requireRole(["ADMIN", "DIRECCION"]);
+  const session = await requireRole(["ADMIN"]);
   const payment = await prisma.payment.findUnique({ where: { id: paymentId }, include: { allocations: true } });
   if (!payment) throw new Error("Pago no encontrado.");
 

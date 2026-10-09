@@ -17,7 +17,7 @@ export type GenerateChargesInput = {
 };
 
 export async function previewRecipients(input: Pick<GenerateChargesInput, "scope" | "levelId" | "groupId" | "childId">) {
-  await requireRole(["ADMIN", "DIRECCION"]);
+  await requireRole(["ADMIN"]);
   return resolveChildren(input);
 }
 
@@ -30,7 +30,7 @@ async function resolveChildren(input: Pick<GenerateChargesInput, "scope" | "leve
 }
 
 export async function generateCharges(input: GenerateChargesInput) {
-  await requireRole(["ADMIN", "DIRECCION"]);
+  await requireRole(["ADMIN"]);
   const children = await resolveChildren(input);
   if (children.length === 0) throw new Error("No hay alumnos para esta selección.");
 

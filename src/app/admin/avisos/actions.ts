@@ -18,7 +18,7 @@ export type CreateNoticeInput = {
 };
 
 export async function createNotice(input: CreateNoticeInput) {
-  const session = await requireRole(["ADMIN", "DIRECCION", "RECEPCION"]);
+  const session = await requireRole(["ADMIN", "RECEPCION"]);
   if (!input.title.trim() || !input.body.trim()) throw new Error("Falta título o mensaje.");
 
   let children: { id: string; groupId: string }[] = [];
@@ -75,13 +75,13 @@ export async function createNotice(input: CreateNoticeInput) {
 }
 
 export async function remindPending(noticeId: string) {
-  await requireRole(["ADMIN", "DIRECCION", "RECEPCION"]);
+  await requireRole(["ADMIN", "RECEPCION"]);
   const count = await prisma.noticeRecipient.count({ where: { noticeId, response: "PENDIENTE" } });
   return count;
 }
 
 export async function getOptionsForAudience() {
-  await requireRole(["ADMIN", "DIRECCION", "RECEPCION"]);
+  await requireRole(["ADMIN", "RECEPCION"]);
   const [levels, groups, children] = await Promise.all([
     prisma.level.findMany({ select: { id: true, name: true } }),
     prisma.group.findMany({ select: { id: true, name: true, levelId: true } }),

@@ -4,7 +4,7 @@ import { demoToday } from "@/lib/dates";
 import { CobranzaAdmin, type FamilyRow } from "./CobranzaAdmin";
 
 export default async function CobranzaPage() {
-  await requireRole(["ADMIN", "DIRECCION", "RECEPCION"]);
+  await requireRole(["ADMIN", "RECEPCION"]);
   const today = demoToday();
   const monthStart = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1));
   const monthEnd = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 1));

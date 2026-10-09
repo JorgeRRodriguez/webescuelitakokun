@@ -38,7 +38,7 @@ function normalize(input: ConceptInput) {
 }
 
 export async function createConcept(input: ConceptInput) {
-  await requireRole(["ADMIN", "DIRECCION"]);
+  await requireRole(["ADMIN"]);
   const data = normalize(input);
 
   const existing = await prisma.concept.findUnique({ where: { key: data.key } });
@@ -52,7 +52,7 @@ export async function createConcept(input: ConceptInput) {
 }
 
 export async function updateConcept(id: string, input: ConceptInput) {
-  await requireRole(["ADMIN", "DIRECCION"]);
+  await requireRole(["ADMIN"]);
   const data = normalize(input);
 
   const existing = await prisma.concept.findUnique({ where: { key: data.key } });

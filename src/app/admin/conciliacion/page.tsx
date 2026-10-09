@@ -4,7 +4,7 @@ import { formatDateUTC } from "@/lib/dates";
 import { ConciliacionAdmin, type PaymentRow } from "./ConciliacionAdmin";
 
 export default async function ConciliacionPage() {
-  await requireRole(["ADMIN", "DIRECCION", "RECEPCION"]);
+  await requireRole(["ADMIN", "RECEPCION"]);
 
   const payments = await prisma.payment.findMany({
     orderBy: { createdAt: "desc" },

@@ -45,7 +45,6 @@ Contraseña para todas: **`kokun2026`**
 | --- | --- |
 | Tutora (varios hijos) | `mariana.lopez@example.com` |
 | Docente | `ana.torres@kokun.mx` |
-| Dirección | `direccion@kokun.mx` |
 | Administración | `administracion@kokun.mx` |
 
 ## Desplegar en Railway

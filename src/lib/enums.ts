@@ -1,7 +1,7 @@
 // SQLite no soporta enums nativos: estos "enums" se guardan como String
 // en la base y se validan/tipan aquí.
 
-export const ROLES = ["TUTOR", "DOCENTE", "ADMIN", "DIRECCION", "RECEPCION"] as const;
+export const ROLES = ["TUTOR", "DOCENTE", "ADMIN", "RECEPCION"] as const;
 export type Role = (typeof ROLES)[number];
 
 export const DAILY_ENTRY_TYPES = ["COMIDA", "SIESTA", "PANIAL", "ACTIVIDAD", "OBSERVACION"] as const;

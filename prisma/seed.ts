@@ -216,24 +216,13 @@ async function main() {
       assignments: { create: [{ roleLabel: "Psicomotricidad" }] },
     },
   });
-  const veronica = await prisma.staff.create({
-    data: {
-      name: "Verónica Aguilar",
-      email: "direccion@kokun.mx",
-      passwordHash,
-      role: "DIRECCION",
-      bio: "Directora del plantel.",
-      avatarInitials: "VA",
-      avatarColor: "#3A2440",
-    },
-  });
   const gabriel = await prisma.staff.create({
     data: {
       name: "Gabriel Soto",
       email: "administracion@kokun.mx",
       passwordHash,
       role: "ADMIN",
-      bio: "Administración y cobranza.",
+      bio: "Dirección y administración del plantel.",
       avatarInitials: "GS",
       avatarColor: "#3A2440",
     },
@@ -582,7 +571,7 @@ async function main() {
       responseType: "AUTORIZACION",
       dueAt: onDay(7),
       createdAt: onDay(-1),
-      authorId: veronica.id,
+      authorId: gabriel.id,
       addToCalendar: true,
     },
   });
@@ -612,7 +601,7 @@ async function main() {
       responseType: "ENTERADO",
       dueAt: onDay(-2),
       createdAt: onDay(-8),
-      authorId: veronica.id,
+      authorId: gabriel.id,
     },
   });
   await prisma.noticeRecipient.create({
@@ -1004,7 +993,6 @@ async function main() {
   console.log(`Fecha de referencia del demo: ${onDay(0).toISOString().slice(0, 10)} (UTC)`);
   console.log("Contraseña de demo para todas las cuentas:", DEMO_PASSWORD);
   console.log("Docente: ana.torres@kokun.mx");
-  console.log("Dirección: direccion@kokun.mx");
   console.log("Administración: administracion@kokun.mx");
   console.log("Tutora (varios hijos): mariana.lopez@example.com");
   void chargeSeptVencido;

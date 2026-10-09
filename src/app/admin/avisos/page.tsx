@@ -4,7 +4,7 @@ import { formatDateUTC } from "@/lib/dates";
 import { NoticesAdmin, type NoticeListItem, type AudienceOptions } from "./NoticesAdmin";
 
 export default async function AvisosAdminPage() {
-  await requireRole(["ADMIN", "DIRECCION", "RECEPCION"]);
+  await requireRole(["ADMIN", "RECEPCION"]);
 
   const notices = await prisma.notice.findMany({
     orderBy: { createdAt: "desc" },

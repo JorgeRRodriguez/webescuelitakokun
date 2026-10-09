@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { AdminNav } from "./AdminNav";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const session = await requireRole(["ADMIN", "DIRECCION", "RECEPCION"]);
+  const session = await requireRole(["ADMIN", "RECEPCION"]);
 
   const paymentsInValidation = await prisma.payment.count({ where: { status: "VALIDACION" } });
 

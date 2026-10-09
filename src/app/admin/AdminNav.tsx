@@ -67,7 +67,7 @@ export function AdminNav({
           })}
         </nav>
         <div className="p-4 flex flex-col gap-2 border-t border-white/10">
-          <p className="text-[11px] text-white/60">Ciclo 2026–2027 · Plantel único</p>
+          <p className="text-[11px] text-white/60">Ciclo 2026–2027 · Polanco</p>
           <LogoutButton className="text-white/70 hover:text-white" />
         </div>
       </aside>

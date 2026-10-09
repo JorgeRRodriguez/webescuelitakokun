@@ -94,7 +94,6 @@ export function roleHome(role: Role): string {
     case "DOCENTE":
       return "/docentes";
     case "ADMIN":
-    case "DIRECCION":
     case "RECEPCION":
       return "/admin";
     default:
