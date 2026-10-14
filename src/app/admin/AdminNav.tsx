@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { Megaphone, Wallet, CircleCheck, ClipboardList } from "lucide-react";
+import { Megaphone, Wallet, CircleCheck, ClipboardList, LogOut } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import { LogoutButton } from "@/components/LogoutButton";
+import { logoutAction } from "@/lib/authActions";
 
 const ITEMS = [
   { href: "/admin/avisos", label: "Avisos y eventos", Icon: Megaphone },
@@ -29,6 +30,18 @@ export function AdminNav({
 
   return (
     <>
+      <header className="md:hidden sticky top-0 z-40 flex items-center justify-between gap-2 px-3 py-2.5 bg-ink text-white">
+        <div className="flex items-center gap-2 min-w-0">
+          <Avatar name={avatarInitials} color={avatarColor} size={32} />
+          <p className="text-sm font-extrabold truncate">{staffName}</p>
+        </div>
+        <form action={logoutAction}>
+          <button type="submit" aria-label="Cerrar sesión" className="text-white/70 p-1">
+            <LogOut size={18} />
+          </button>
+        </form>
+      </header>
+
       <aside className="hidden md:flex md:w-[220px] shrink-0 flex-col bg-ink text-white">
         <div className="p-4">
           <div className="inline-block bg-white rounded-[10px] px-2.5 py-1.5">

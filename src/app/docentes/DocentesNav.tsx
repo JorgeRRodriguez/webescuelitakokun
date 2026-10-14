@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
+import { LogOut } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import { KokunLogo } from "@/components/KokunLogo";
 import { LogoutButton } from "@/components/LogoutButton";
+import { logoutAction } from "@/lib/authActions";
 
 const ITEMS = [
   { href: "/docentes/mi-grupo", label: "Mi grupo", icon: "👥" },
@@ -33,6 +35,22 @@ export function DocentesNav({
 
   return (
     <>
+      {/* Encabezado — móvil */}
+      <header className="md:hidden sticky top-0 z-40 flex items-center justify-between gap-2 px-3 py-2.5 bg-white border-b border-borde-card">
+        <div className="flex items-center gap-2 min-w-0">
+          <Avatar name={avatarInitials} color={avatarColor} size={32} />
+          <div className="min-w-0">
+            <p className="text-sm font-extrabold truncate">{staffName}</p>
+            <p className="text-[10px] text-texto-3 truncate">{roleLabel}</p>
+          </div>
+        </div>
+        <form action={logoutAction}>
+          <button type="submit" aria-label="Cerrar sesión" className="text-texto-3 p-1">
+            <LogOut size={18} />
+          </button>
+        </form>
+      </header>
+
       {/* Riel lateral — tablet y escritorio */}
       <aside className="hidden md:flex md:w-[196px] shrink-0 flex-col bg-white border-r border-borde-card">
         <div className="p-4 border-b border-divisor">
